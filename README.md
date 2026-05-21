@@ -166,4 +166,4 @@ This project is open source and available under the [MIT License](LICENSE).
 
 **Nasir Hussain**
 - GitHub: [@NasirHussain03](https://github.com/NasirHussain03)
-- LinkedIn: [LinkedIn Profile]()
+- LinkedIn: [LinkedIn Profile](https://www.linkedin.com/in/nasir-hussain-325409266/)
