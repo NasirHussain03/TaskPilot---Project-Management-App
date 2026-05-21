@@ -1,6 +1,9 @@
-# 🚀 TaskFlow — Full Stack Project Management App
+# 🚀 TaskPilot — Project Management App
 
-TaskFlow is a modern full-stack project management web application built using React, Node.js, Express, and MongoDB. The app allows teams to create projects, assign tasks, track progress, and collaborate efficiently with secure role-based access control. TaskPilot helps teams organize projects, track tasks, collaborate in real-time, and stay on top of deadlines.
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Railway-6d28d9?style=for-the-badge&logo=railway&logoColor=white)](https://taskpilot-app.up.railway.app)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)](https://github.com/NasirHussain03/TaskPilot---Project-Management-App)
+
+TaskPilot is a modern full-stack project management web application built using React, Node.js, Express, and MongoDB. The app allows teams to create projects, assign tasks, track progress, and collaborate efficiently with secure role-based access control.
 
 
 ## ✨ Features
