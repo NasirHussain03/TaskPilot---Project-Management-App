@@ -5,10 +5,15 @@ const User = require('../models/User');
 let io;
 
 const init = (httpServer) => {
+  const allowedOrigins = process.env.CLIENT_URL
+    ? process.env.CLIENT_URL.split(",").map((o) => o.trim())
+    : ["http://localhost:3000"];
+
   io = new Server(httpServer, {
     cors: {
-      origin: '*', // Allow development origins
+      origin: allowedOrigins,
       methods: ['GET', 'POST', 'PUT', 'DELETE'],
+      credentials: true,
     },
   });
 

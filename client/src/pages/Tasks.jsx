@@ -173,7 +173,7 @@ const TaskDetailModal = ({ task, onClose, onUpdate, onEdit, currentUser, project
                 localTask.attachments.map((att) => (
                   <div key={att._id} className="flex items-center justify-between bg-slate-950/40 border border-slate-850 p-2.5 rounded-xl text-xs">
                     <a
-                      href={`${process.env.REACT_APP_SOCKET_URL || 'http://localhost:5000'}${att.url}`}
+                      href={`${(process.env.REACT_APP_API_URL || 'http://localhost:5000/api').replace('/api', '')}${att.url}`}
                       target="_blank"
                       rel="noreferrer"
                       className="text-slate-300 hover:text-violet-400 hover:underline font-semibold truncate max-w-[80%]"
