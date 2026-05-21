@@ -1,0 +1,220 @@
+/* ─── Google Fonts ──────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Base ──────────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #020817;
+  color: #f1f5f9;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+/* ─── Custom Scrollbar ──────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.3);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.6);
+}
+
+/* ─── Keyframe Animations ───────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-12px); }
+}
+
+@keyframes floatReverse {
+  0%, 100% { transform: translateY(0px) rotate(180deg); }
+  50%       { transform: translateY(12px) rotate(180deg); }
+}
+
+@keyframes orb-drift {
+  0%   { transform: translate(0, 0) scale(1); }
+  33%  { transform: translate(30px, -20px) scale(1.05); }
+  66%  { transform: translate(-20px, 15px) scale(0.97); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+@keyframes orb-drift-2 {
+  0%   { transform: translate(0, 0) scale(1); }
+  33%  { transform: translate(-25px, 20px) scale(1.03); }
+  66%  { transform: translate(20px, -15px) scale(0.98); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes particle-float {
+  0%   { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0.4; }
+  50%  { transform: translateY(-80px) translateX(20px) rotate(180deg); opacity: 0.8; }
+  100% { transform: translateY(-160px) translateX(-10px) rotate(360deg); opacity: 0; }
+}
+
+@keyframes auth-grid-pulse {
+  0%, 100% { opacity: 0.03; }
+  50%       { opacity: 0.07; }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(139,92,246,0.2); }
+  50%       { box-shadow: 0 0 40px rgba(139,92,246,0.5), 0 0 60px rgba(99,102,241,0.2); }
+}
+
+@keyframes border-glow {
+  0%, 100% { border-color: rgba(139,92,246,0.2); }
+  50%       { border-color: rgba(139,92,246,0.6); }
+}
+
+/* ─── Animation Utilities ───────────────────────────────── */
+.animate-fade-in       { animation: fadeIn 0.25s ease-out forwards; }
+.animate-slide-left    { animation: slideInLeft 0.3s ease-out forwards; }
+.animate-slide-right   { animation: slideInRight 0.3s ease-out forwards; }
+.animate-scale-in      { animation: scaleIn 0.2s ease-out forwards; }
+.animate-float         { animation: float 4s ease-in-out infinite; }
+.animate-float-reverse { animation: floatReverse 5s ease-in-out infinite; }
+.animate-orb-1         { animation: orb-drift 12s ease-in-out infinite; }
+.animate-orb-2         { animation: orb-drift-2 16s ease-in-out infinite; }
+.animate-spin-slow     { animation: spin-slow 20s linear infinite; }
+.animate-glow-pulse    { animation: glow-pulse 3s ease-in-out infinite; }
+.animate-border-glow   { animation: border-glow 2s ease-in-out infinite; }
+
+/* ─── Gradient Shimmer Text ─────────────────────────────── */
+.shimmer-text {
+  background: linear-gradient(
+    90deg,
+    #a78bfa 0%,
+    #818cf8 25%,
+    #c4b5fd 50%,
+    #818cf8 75%,
+    #a78bfa 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 4s linear infinite;
+}
+
+/* ─── Glass Morphism ────────────────────────────────────── */
+.glass {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(148, 163, 184, 0.08);
+}
+
+.glass-card {
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(139, 92, 246, 0.15);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.5),
+    0 2px 4px -2px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+/* ─── Auth Layout Grid ──────────────────────────────────── */
+.auth-grid-bg {
+  background-image:
+    linear-gradient(rgba(139,92,246,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139,92,246,0.05) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: auth-grid-pulse 6s ease-in-out infinite;
+}
+
+/* ─── Focus Ring ────────────────────────────────────────── */
+.focus-ring:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.4);
+}
+
+/* ─── Input Glow on Focus ───────────────────────────────── */
+input:focus, textarea:focus, select:focus {
+  box-shadow: 0 0 0 2px rgba(139,92,246,0.2);
+}
+
+/* ─── Responsive Mobile Sidebar ─────────────────────────── */
+@media (max-width: 768px) {
+  .sidebar-mobile-hidden {
+    display: none !important;
+  }
+  .sidebar-mobile-shown {
+    display: flex !important;
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    width: 100vw;
+    background: rgba(2, 8, 23, 0.95);
+    backdrop-filter: blur(20px);
+  }
+}
+
+/* ─── Kanban Drag-Over ──────────────────────────────────── */
+.drag-over {
+  background: rgba(139, 92, 246, 0.05);
+  border-color: rgba(139, 92, 246, 0.4) !important;
+}
+
+/* ─── Toast / Notification Badge ───────────────────────── */
+.notification-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #8b5cf6;
+  box-shadow: 0 0 8px rgba(139,92,246,0.8);
+  animation: glow-pulse 2s ease-in-out infinite;
+}
