@@ -155,3 +155,13 @@ The API runs at **http://localhost:5000**
 ## License
 
 This project is open source and available under the [MIT License](LICENSE).
+
+## 👨‍💻 Author
+
+**Nasir Hussain**
+- GitHub: [@NasirHussain03](https://github.com/NasirHussain03)
+- LinkedIn: [LinkedIn Profile]()
+
+---
+
+*Built with ❤️ using the MERN stack*
