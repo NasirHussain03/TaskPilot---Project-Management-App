@@ -20,13 +20,17 @@ const colAccent = (s) => {
 };
 
 // ─── Task Card ────────────────────────────────────────────
-const TaskCard = ({ task, onEdit, onDelete, onDragStart }) => {
+const TaskCard = ({ task, onView, onEdit, onDelete, onRequestAssignment, currentUser, onDragStart }) => {
+  const isAdmin = currentUser?.role === 'Admin';
+  const isAssignee = task.assignedTo?._id === currentUser?._id || task.assignedTo === currentUser?._id;
   const overdue = task.status !== 'Completed' && task.dueDate && new Date(task.dueDate) < new Date();
+  const alreadyRequested = task.assignedTo && !isAssignee; // has assignee but not me
+
   return (
     <div
-      draggable
-      onDragStart={(e) => onDragStart(e, task._id)}
-      className="bg-slate-900/70 border border-slate-800 p-4 rounded-xl space-y-3 cursor-grab active:cursor-grabbing hover:border-slate-700 transition-all group shadow-sm"
+      draggable={isAdmin || isAssignee}
+      onDragStart={(e) => (isAdmin || isAssignee) && onDragStart(e, task._id)}
+      className={`bg-slate-900/70 border border-slate-800 p-4 rounded-xl space-y-3 hover:border-slate-700 transition-all group shadow-sm ${isAdmin || isAssignee ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'}`}
     >
       <div className="flex justify-between items-start gap-2">
         <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wide">{task.project?.title}</span>
@@ -45,12 +49,32 @@ const TaskCard = ({ task, onEdit, onDelete, onDragStart }) => {
       <div className="flex justify-between items-center border-t border-slate-800/50 pt-2">
         <span className="text-[10px] text-slate-600">{task.comments?.length || 0} comment{task.comments?.length !== 1 ? 's' : ''}</span>
         <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button onClick={() => onEdit(task)} className="text-slate-500 hover:text-violet-400 transition-colors cursor-pointer" title="View / Edit">
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+          {/* View button — everyone can view */}
+          <button onClick={() => onView(task)} className="text-slate-500 hover:text-violet-400 transition-colors cursor-pointer" title="View Details">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
           </button>
-          <button onClick={() => onDelete(task._id)} className="text-slate-500 hover:text-rose-400 transition-colors cursor-pointer" title="Delete">
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-          </button>
+          {/* Edit — Admin only */}
+          {isAdmin && (
+            <button onClick={() => onEdit(task)} className="text-slate-500 hover:text-violet-400 transition-colors cursor-pointer" title="Edit Task">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+            </button>
+          )}
+          {/* Delete — Admin only */}
+          {isAdmin && (
+            <button onClick={() => onDelete(task._id)} className="text-slate-500 hover:text-rose-400 transition-colors cursor-pointer" title="Delete">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+            </button>
+          )}
+          {/* Request Assignment — Members only, unassigned tasks */}
+          {!isAdmin && !isAssignee && (
+            <button
+              onClick={() => onRequestAssignment(task)}
+              className="text-slate-500 hover:text-amber-400 transition-colors cursor-pointer"
+              title="Request Assignment"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -113,10 +137,11 @@ const TaskDetailModal = ({ task, onClose, onUpdate, onEdit, currentUser, project
   };
 
   const matchingProject = projects.find((p) => p._id === (localTask.project?._id || localTask.project));
-  const isCreator = matchingProject?.createdBy?._id === currentUser?._id || matchingProject?.createdBy === currentUser?._id;
-  const isMember = matchingProject?.members?.some((m) => m?._id === currentUser?._id || m === currentUser?._id);
   const isAssignee = localTask.assignedTo?._id === currentUser?._id || localTask.assignedTo === currentUser?._id;
-  const canEdit = isCreator || isMember || isAssignee || currentUser?.role === 'Admin';
+  const isAdminUser = currentUser?.role === 'Admin';
+  // Members can only comment/upload on their assigned tasks; Admins can edit everything
+  const canEdit = isAdminUser;
+  const canInteract = isAdminUser || isAssignee;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
@@ -214,19 +239,25 @@ const TaskDetailModal = ({ task, onClose, onUpdate, onEdit, currentUser, project
             </div>
           </div>
         </div>
-        {/* Comment Input */}
-        <div className="p-4 border-t border-slate-800 flex gap-2 shrink-0">
-          <input
-            value={commentText}
-            onChange={(e) => setCommentText(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleComment()}
-            placeholder="Add a comment..."
-            className="flex-1 px-3 py-2 bg-slate-950/60 border border-slate-800 focus:border-violet-500 focus:outline-none rounded-xl text-sm text-slate-100 placeholder-slate-600"
-          />
-          <button onClick={handleComment} disabled={submitting || !commentText.trim()} className="px-4 py-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition-all cursor-pointer">
-            Send
-          </button>
-        </div>
+        {/* Comment Input — only for assignees and admins */}
+        {canInteract ? (
+          <div className="p-4 border-t border-slate-800 flex gap-2 shrink-0">
+            <input
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleComment()}
+              placeholder="Add a comment..."
+              className="flex-1 px-3 py-2 bg-slate-950/60 border border-slate-800 focus:border-violet-500 focus:outline-none rounded-xl text-sm text-slate-100 placeholder-slate-600"
+            />
+            <button onClick={handleComment} disabled={submitting || !commentText.trim()} className="px-4 py-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition-all cursor-pointer">
+              Send
+            </button>
+          </div>
+        ) : (
+          <div className="p-4 border-t border-slate-800 shrink-0">
+            <p className="text-xs text-slate-600 text-center italic">Only the assigned member or an Admin can comment on this task.</p>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -418,6 +449,15 @@ export default function Tasks() {
     setDetailTask(updated);
   };
 
+  const handleRequestAssignment = async (task) => {
+    try {
+      await API.post(`/tasks/${task._id}/request-assignment`);
+      alert(`Assignment request sent to Admins for task "${task.title}"`);
+    } catch (e) {
+      alert(e.response?.data?.error || 'Failed to send request');
+    }
+  };
+
   // ── Filtering ─────────────────────────────────────────────
   const filtered = tasks.filter((t) => {
     const matchSearch = t.title.toLowerCase().includes(search.toLowerCase()) || (t.description || '').toLowerCase().includes(search.toLowerCase());
@@ -436,12 +476,18 @@ export default function Tasks() {
       <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
         <div>
           <h2 className="text-2xl font-bold text-slate-100">Tasks Board</h2>
-          <p className="text-slate-400 text-sm">Drag cards between columns to update status</p>
+          <p className="text-slate-400 text-sm">
+            {currentUser?.role === 'Admin'
+              ? 'Drag cards between columns to update status'
+              : 'View tasks · drag your assigned tasks · request assignment on others'}
+          </p>
         </div>
-        <button onClick={() => setFormModal({ mode: 'create', initial: null })} className="px-5 py-2.5 bg-violet-600 hover:bg-violet-500 rounded-xl font-semibold text-white text-sm transition-all flex items-center gap-2 cursor-pointer shadow-lg">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
-          Add Task
-        </button>
+        {currentUser?.role === 'Admin' && (
+          <button onClick={() => setFormModal({ mode: 'create', initial: null })} className="px-5 py-2.5 bg-violet-600 hover:bg-violet-500 rounded-xl font-semibold text-white text-sm transition-all flex items-center gap-2 cursor-pointer shadow-lg">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
+            Add Task
+          </button>
+        )}
       </div>
 
       {/* Filters */}
@@ -486,8 +532,11 @@ export default function Tasks() {
                     <TaskCard
                       key={task._id}
                       task={task}
-                      onEdit={(t) => setDetailTask(t)}
+                      currentUser={currentUser}
+                      onView={(t) => setDetailTask(t)}
+                      onEdit={(t) => setFormModal({ mode: 'edit', initial: t })}
                       onDelete={handleDelete}
+                      onRequestAssignment={handleRequestAssignment}
                       onDragStart={handleDragStart}
                     />
                   ))

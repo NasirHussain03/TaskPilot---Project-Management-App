@@ -31,9 +31,13 @@ const getProjects = async (req, res) => {
 
 // @desc    Create a project
 // @route   POST /api/projects
-// @access  Private
+// @access  Admin only
 const createProject = async (req, res) => {
   try {
+    if (req.user.role !== 'Admin') {
+      return res.status(403).json({ error: 'Access Denied: Only Admins can create projects' });
+    }
+
     const { title, description, members } = req.body;
 
     const project = await Project.create({

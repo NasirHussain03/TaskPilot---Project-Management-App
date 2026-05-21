@@ -124,17 +124,21 @@ const Projects = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-slate-100">Projects</h2>
-          <p className="text-slate-400 text-sm">Manage your collaborative work folders</p>
+          <p className="text-slate-400 text-sm">
+            {currentUser?.role === 'Admin' ? 'Manage your collaborative work folders' : 'Your assigned project workspaces'}
+          </p>
         </div>
-        <button
-          onClick={openCreateModal}
-          className="px-5 py-2.5 bg-violet-600 hover:bg-violet-500 rounded-xl font-semibold text-white transition-all shadow-lg hover:shadow-violet-600/20 flex items-center gap-2 cursor-pointer"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-          </svg>
-          New Project
-        </button>
+        {currentUser?.role === 'Admin' && (
+          <button
+            onClick={openCreateModal}
+            className="px-5 py-2.5 bg-violet-600 hover:bg-violet-500 rounded-xl font-semibold text-white transition-all shadow-lg hover:shadow-violet-600/20 flex items-center gap-2 cursor-pointer"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+            </svg>
+            New Project
+          </button>
+        )}
       </div>
 
       {error && (
@@ -218,7 +222,9 @@ const Projects = () => {
           })
         ) : (
           <div className="col-span-full bg-slate-900/20 border border-slate-800/80 border-dashed py-12 rounded-2xl text-center text-slate-400 text-sm">
-            No projects found. Click "New Project" to build one!
+            {currentUser?.role === 'Admin'
+              ? 'No projects found. Click "New Project" to build one!'
+              : 'You have not been added to any projects yet. Contact an Admin to get added.'}
           </div>
         )}
       </div>

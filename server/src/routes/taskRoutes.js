@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getTasks, createTask, updateTask, deleteTask, addComment, addAttachment, removeAttachment } = require('../controllers/taskController');
+const { getTasks, createTask, updateTask, deleteTask, addComment, addAttachment, removeAttachment, requestAssignment } = require('../controllers/taskController');
 const { protect } = require('../middleware/authMiddleware');
 const { createTaskValidator, updateTaskValidator } = require('../validators/taskValidator');
 
@@ -18,5 +18,6 @@ router.route('/:id')
 router.post('/:id/comments', addComment);
 router.post('/:id/attachments', addAttachment);
 router.delete('/:id/attachments/:attachmentId', removeAttachment);
+router.post('/:id/request-assignment', requestAssignment);
 
 module.exports = router;

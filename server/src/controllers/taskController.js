@@ -36,9 +36,13 @@ const getTasks = async (req, res) => {
 
 // @desc    Create a task
 // @route   POST /api/tasks
-// @access  Private
+// @access  Admin only
 const createTask = async (req, res) => {
   try {
+    if (req.user.role !== 'Admin') {
+      return res.status(403).json({ error: 'Access Denied: Only Admins can create and assign tasks' });
+    }
+
     const { title, description, status, priority, dueDate, assignedTo, project: projectId } = req.body;
 
     const project = await Project.findById(projectId);
@@ -113,24 +117,36 @@ const updateTask = async (req, res) => {
       return res.status(404).json({ error: 'Associated project not found' });
     }
 
-    // Check if user is project creator, project member, task assignee, or Admin
+    // Check permissions based on role
+    const isAdminUser = req.user.role === 'Admin';
     const isCreator = project.createdBy.toString() === req.user._id.toString();
-    const isMember = project.members.some((mId) => mId.toString() === req.user._id.toString());
     const isAssignee = task.assignedTo && task.assignedTo.toString() === req.user._id.toString();
+    const isMember = project.members.some((mId) => mId.toString() === req.user._id.toString());
 
-    if (!isCreator && !isMember && !isAssignee && req.user.role !== 'Admin') {
-      return res.status(403).json({ error: 'Access Denied: You do not have permission to update this task' });
+    // Members can only update status on tasks assigned to them
+    if (!isAdminUser && !isCreator) {
+      if (!isAssignee) {
+        return res.status(403).json({ error: 'Access Denied: You can only update tasks assigned to you' });
+      }
+      // Members can only change status — nothing else
+      if (title || description !== undefined || priority || dueDate !== undefined || assignedTo !== undefined) {
+        return res.status(403).json({ error: 'Access Denied: Members can only update the status of their assigned tasks' });
+      }
     }
 
     const oldStatus = task.status;
     const oldAssignee = task.assignedTo ? task.assignedTo.toString() : null;
 
-    task.title = title || task.title;
-    task.description = description !== undefined ? description : task.description;
+    // Admins and project creators can update all fields
+    if (isAdminUser || isCreator) {
+      task.title = title || task.title;
+      task.description = description !== undefined ? description : task.description;
+      task.priority = priority || task.priority;
+      task.dueDate = dueDate !== undefined ? dueDate : task.dueDate;
+      task.assignedTo = assignedTo !== undefined ? (assignedTo === '' ? null : assignedTo) : task.assignedTo;
+    }
+    // Everyone allowed can update status
     task.status = status || task.status;
-    task.priority = priority || task.priority;
-    task.dueDate = dueDate !== undefined ? dueDate : task.dueDate;
-    task.assignedTo = assignedTo !== undefined ? (assignedTo === '' ? null : assignedTo) : task.assignedTo;
 
     await task.save();
 
@@ -200,13 +216,10 @@ const deleteTask = async (req, res) => {
       return res.status(404).json({ error: 'Associated project not found' });
     }
 
-    // Check permissions
+    // Check permissions: only Admin or project creator can delete tasks
     const isCreator = project.createdBy.toString() === req.user._id.toString();
-    const isMember = project.members.some((mId) => mId.toString() === req.user._id.toString());
-    const isAssignee = task.assignedTo && task.assignedTo.toString() === req.user._id.toString();
-
-    if (!isCreator && !isMember && !isAssignee && req.user.role !== 'Admin') {
-      return res.status(403).json({ error: 'Access Denied: You do not have permission to delete this task' });
+    if (!isCreator && req.user.role !== 'Admin') {
+      return res.status(403).json({ error: 'Access Denied: Only Admins or project creators can delete tasks' });
     }
 
     await Task.findByIdAndDelete(task._id);
@@ -372,6 +385,53 @@ const removeAttachment = async (req, res) => {
   }
 };
 
+// @desc    Member requests to be assigned to a task
+// @route   POST /api/tasks/:id/request-assignment
+// @access  Member only
+const requestAssignment = async (req, res) => {
+  try {
+    if (req.user.role === 'Admin') {
+      return res.status(400).json({ error: 'Admins can directly assign tasks — no request needed' });
+    }
+
+    const task = await Task.findById(req.params.id).populate('project', 'title createdBy');
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    if (task.assignedTo && task.assignedTo.toString() === req.user._id.toString()) {
+      return res.status(400).json({ error: 'You are already assigned to this task' });
+    }
+
+    const project = await Project.findById(task.project._id || task.project);
+    if (!project) {
+      return res.status(404).json({ error: 'Project not found' });
+    }
+
+    // Notify all Admins via the notification/mail system
+    const admins = await User.find({ role: 'Admin' });
+    for (const admin of admins) {
+      await sendMailMock(
+        admin.email,
+        `TaskPilot: Assignment Request for "${task.title}"`,
+        `Hello ${admin.name},\n\n${req.user.name} (${req.user.email}) has requested to be assigned to the task "${task.title}" in project "${project.title}".\n\nPlease review and assign them from the Tasks board.`
+      );
+    }
+
+    await logActivity(
+      req.user._id,
+      project._id,
+      'Requested Assignment',
+      `${req.user.name} requested assignment to task "${task.title}"`
+    );
+
+    res.json({ message: 'Assignment request sent to Admins successfully' });
+  } catch (error) {
+    console.error(`Request Assignment Error: ${error.message}`);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
 module.exports = {
   getTasks,
   createTask,
@@ -380,4 +440,5 @@ module.exports = {
   addComment,
   addAttachment,
   removeAttachment,
+  requestAssignment,
 };
