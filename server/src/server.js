@@ -22,7 +22,10 @@ const server = http.createServer(app);
 // Initialize Socket.io
 socketHelper.init(server);
 
-app.use(cors());
+app.use(cors({
+  origin: process.env.CLIENT_URL || '*',
+  credentials: true,
+}));
 app.use(express.json());
 
 // Serve static uploads
