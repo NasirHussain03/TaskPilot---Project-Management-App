@@ -173,7 +173,7 @@ const TaskDetailModal = ({ task, onClose, onUpdate, onEdit, currentUser, project
                 localTask.attachments.map((att) => (
                   <div key={att._id} className="flex items-center justify-between bg-slate-950/40 border border-slate-850 p-2.5 rounded-xl text-xs">
                     <a
-                      href={`http://localhost:5000${att.url}`}
+                      href={`${process.env.REACT_APP_SOCKET_URL || 'http://localhost:5000'}${att.url}`}
                       target="_blank"
                       rel="noreferrer"
                       className="text-slate-300 hover:text-violet-400 hover:underline font-semibold truncate max-w-[80%]"
@@ -345,8 +345,8 @@ export default function Tasks() {
   const fetchData = useCallback(async () => {
     try {
       const [tRes, pRes] = await Promise.all([API.get('/tasks'), API.get('/projects')]);
-      setTasks(tRes.data);
-      setProjects(pRes.data);
+      setTasks(Array.isArray(tRes.data) ? tRes.data : []);
+      setProjects(Array.isArray(pRes.data) ? pRes.data : []);
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
   }, []);

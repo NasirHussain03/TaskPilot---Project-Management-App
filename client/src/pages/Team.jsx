@@ -21,8 +21,8 @@ const Team = () => {
           API.get('/users'),
           API.get('/projects'),
         ]);
-        setUsers(usersRes.data);
-        setProjects(projectsRes.data);
+        setUsers(Array.isArray(usersRes.data) ? usersRes.data : []);
+        setProjects(Array.isArray(projectsRes.data) ? projectsRes.data : []);
       } catch (err) {
         setError('Failed to fetch team members');
         console.error(err);

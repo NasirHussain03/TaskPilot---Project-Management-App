@@ -29,7 +29,7 @@ const Layout = () => {
   const fetchNotifications = async () => {
     try {
       const { data } = await API.get('/notifications');
-      setNotifications(data);
+      setNotifications(Array.isArray(data) ? data : []);
     } catch (e) {
       console.error('Error fetching notifications:', e);
     }

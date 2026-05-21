@@ -27,9 +27,9 @@ const Dashboard = () => {
           API.get('/projects'),
           API.get('/activities'),
         ]);
-        setTasks(tasksRes.data);
-        setProjects(projectsRes.data);
-        setActivities(activitiesRes.data);
+        setTasks(Array.isArray(tasksRes.data) ? tasksRes.data : []);
+        setProjects(Array.isArray(projectsRes.data) ? projectsRes.data : []);
+        setActivities(Array.isArray(activitiesRes.data) ? activitiesRes.data : []);
       } catch (err) {
         setError('Failed to fetch dashboard data');
         console.error(err);

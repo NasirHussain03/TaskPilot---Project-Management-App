@@ -25,8 +25,8 @@ const Projects = () => {
         API.get('/projects'),
         API.get('/users'),
       ]);
-      setProjects(projectsRes.data);
-      setUsers(usersRes.data);
+      setProjects(Array.isArray(projectsRes.data) ? projectsRes.data : []);
+      setUsers(Array.isArray(usersRes.data) ? usersRes.data : []);
     } catch (err) {
       setError('Failed to fetch projects or users');
       console.error(err);
