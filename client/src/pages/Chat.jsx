@@ -22,7 +22,7 @@ const Chat = () => {
     const fetchChatLogs = async () => {
       try {
         const { data } = await API.get('/chat');
-        setMessages(data);
+        setMessages(Array.isArray(data) ? data : []);
       } catch (err) {
         setError('Failed to load chat history');
         console.error(err);

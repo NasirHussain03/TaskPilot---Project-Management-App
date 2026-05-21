@@ -14,7 +14,7 @@ const Calendar = () => {
     const fetchTasks = async () => {
       try {
         const { data } = await API.get('/tasks');
-        setTasks(data);
+        setTasks(Array.isArray(data) ? data : []);
       } catch (err) {
         setError('Failed to fetch tasks for calendar');
         console.error(err);

@@ -17,10 +17,16 @@ export const AuthProvider = ({ children }) => {
         try {
           const parsedUser = JSON.parse(savedUser);
           setUser(parsedUser);
+          // Re-validate token against server and refresh user data
+          const { data } = await API.get('/auth/me');
+          setUser(data);
+          localStorage.setItem('user', JSON.stringify(data));
           socket.connect();
         } catch (e) {
+          // Token invalid or expired — clear everything
           localStorage.removeItem('token');
           localStorage.removeItem('user');
+          setUser(null);
         }
       }
       setLoading(false);
