@@ -370,8 +370,6 @@ export default function Tasks() {
   const [detailTask, setDetailTask] = useState(null);
 
   const { user: currentUser } = useAuth();
-  // Track IDs of tasks created by this client to avoid socket double-add
-  const locallyCreatedIds = React.useRef(new Set());
   // Track IDs of tasks updated by this client to avoid socket double-update
   const locallyUpdatedIds = React.useRef(new Set());
 
@@ -389,13 +387,7 @@ export default function Tasks() {
   // Real-time synchronization
   useEffect(() => {
     socket.on('task:created', (newTask) => {
-      // Skip if this client created it — already added via handleSave
-      if (locallyCreatedIds.current.has(newTask._id)) {
-        locallyCreatedIds.current.delete(newTask._id);
-        // Still replace with the fully populated version from socket
-        setTasks((prev) => prev.map((t) => t._id === newTask._id ? newTask : t));
-        return;
-      }
+      // Single source of truth — always add via socket, never optimistically
       setTasks((prev) => {
         if (prev.some((t) => t._id === newTask._id)) return prev;
         return [newTask, ...prev];
@@ -451,13 +443,11 @@ export default function Tasks() {
 
   // ── Task mutations ────────────────────────────────────────
   const handleSave = (savedTask, mode) => {
-    if (mode === 'create') {
-      locallyCreatedIds.current.add(savedTask._id);
-      setTasks((prev) => [savedTask, ...prev]);
-    } else {
+    if (mode === 'update') {
       locallyUpdatedIds.current.add(savedTask._id);
       setTasks((prev) => prev.map((t) => t._id === savedTask._id ? savedTask : t));
     }
+    // For 'create': do nothing — socket task:created event will add it
   };
 
   const handleDelete = async (taskId) => {
