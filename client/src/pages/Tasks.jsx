@@ -372,6 +372,8 @@ export default function Tasks() {
   const { user: currentUser } = useAuth();
   // Track IDs of tasks created by this client to avoid socket double-add
   const locallyCreatedIds = React.useRef(new Set());
+  // Track IDs of tasks updated by this client to avoid socket double-update
+  const locallyUpdatedIds = React.useRef(new Set());
 
   const fetchData = useCallback(async () => {
     try {
@@ -401,6 +403,14 @@ export default function Tasks() {
     });
 
     socket.on('task:updated', (updatedTask) => {
+      // Skip if this client triggered the update — already handled optimistically
+      if (locallyUpdatedIds.current.has(updatedTask._id)) {
+        locallyUpdatedIds.current.delete(updatedTask._id);
+        // Still apply the fully populated server version
+        setTasks((prev) => prev.map((t) => t._id === updatedTask._id ? updatedTask : t));
+        setDetailTask((current) => (current && current._id === updatedTask._id ? updatedTask : current));
+        return;
+      }
       setTasks((prev) => prev.map((t) => t._id === updatedTask._id ? updatedTask : t));
       setDetailTask((current) => (current && current._id === updatedTask._id ? updatedTask : current));
     });
@@ -429,9 +439,11 @@ export default function Tasks() {
     // Optimistic update
     setTasks((prev) => prev.map((t) => t._id === taskId ? { ...t, status: newStatus } : t));
     try {
+      locallyUpdatedIds.current.add(taskId);
       const { data } = await API.put(`/tasks/${taskId}`, { status: newStatus });
       setTasks((prev) => prev.map((t) => t._id === data._id ? data : t));
     } catch (e) {
+      locallyUpdatedIds.current.delete(taskId);
       // Revert
       setTasks((prev) => prev.map((t) => t._id === taskId ? task : t));
     }
@@ -443,6 +455,7 @@ export default function Tasks() {
       locallyCreatedIds.current.add(savedTask._id);
       setTasks((prev) => [savedTask, ...prev]);
     } else {
+      locallyUpdatedIds.current.add(savedTask._id);
       setTasks((prev) => prev.map((t) => t._id === savedTask._id ? savedTask : t));
     }
   };
