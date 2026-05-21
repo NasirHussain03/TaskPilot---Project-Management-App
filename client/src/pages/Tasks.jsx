@@ -24,7 +24,6 @@ const TaskCard = ({ task, onView, onEdit, onDelete, onRequestAssignment, current
   const isAdmin = currentUser?.role === 'Admin';
   const isAssignee = task.assignedTo?._id === currentUser?._id || task.assignedTo === currentUser?._id;
   const overdue = task.status !== 'Completed' && task.dueDate && new Date(task.dueDate) < new Date();
-  const alreadyRequested = task.assignedTo && !isAssignee; // has assignee but not me
 
   return (
     <div
@@ -136,7 +135,6 @@ const TaskDetailModal = ({ task, onClose, onUpdate, onEdit, currentUser, project
     }
   };
 
-  const matchingProject = projects.find((p) => p._id === (localTask.project?._id || localTask.project));
   const isAssignee = localTask.assignedTo?._id === currentUser?._id || localTask.assignedTo === currentUser?._id;
   const isAdminUser = currentUser?.role === 'Admin';
   // Members can only comment/upload on their assigned tasks; Admins can edit everything
