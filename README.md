@@ -1,10 +1,9 @@
-# TaskPilot — Project Management App
+# 🚀 TaskFlow — Full Stack Project Management App
 
-A full-stack project management application built with React, Node.js, Express, and MongoDB. TaskPilot helps teams organize projects, track tasks, collaborate in real-time, and stay on top of deadlines.
+TaskFlow is a modern full-stack project management web application built using React, Node.js, Express, and MongoDB. The app allows teams to create projects, assign tasks, track progress, and collaborate efficiently with secure role-based access control. TaskPilot helps teams organize projects, track tasks, collaborate in real-time, and stay on top of deadlines.
 
----
 
-## Features
+## ✨ Features
 
 - **Authentication** — Secure register/login with JWT and bcrypt password hashing
 - **Projects** — Create, update, and delete projects with member management
@@ -20,7 +19,7 @@ A full-stack project management application built with React, Node.js, Express, 
 
 ---
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 ### Frontend
 | Tech | Purpose |
@@ -46,7 +45,7 @@ A full-stack project management application built with React, Node.js, Express, 
 
 ---
 
-## Project Structure
+## 📂 Project Structure
 
 ```
 TaskPilot/
@@ -74,7 +73,7 @@ TaskPilot/
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 - Node.js v18+
@@ -141,7 +140,7 @@ The API runs at **http://localhost:5000**
 
 ---
 
-## Environment Variables
+## ⚙️ Environment Variables
 
 | Variable | Description |
 |----------|-------------|
@@ -152,6 +151,10 @@ The API runs at **http://localhost:5000**
 
 ---
 
+## 📸 UI Inspiration
+
+Inspired by modern SaaS applications like Linear, Notion, and Jira with a clean and professional dashboard design.
+
 ## License
 
 This project is open source and available under the [MIT License](LICENSE).
@@ -161,7 +164,3 @@ This project is open source and available under the [MIT License](LICENSE).
 **Nasir Hussain**
 - GitHub: [@NasirHussain03](https://github.com/NasirHussain03)
 - LinkedIn: [LinkedIn Profile]()
-
----
-
-*Built with ❤️ using the MERN stack*
